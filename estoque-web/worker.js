@@ -59,7 +59,7 @@ const HTML = `<!DOCTYPE html>
 
       <div class="flex items-center gap-3 mt-4 md:mt-0">
         <span id="badge-total" class="bg-rosa text-white px-3 py-1.5 rounded-full font-bold text-sm">0 itens</span>
-        <button onclick="app.abrirConfig()" class="bg-texto-escuro text-white px-3 py-1.5 rounded-lg text-sm hover:bg-[#1A151B] transition">TagPlus</button>
+        <button onclick="app.abrirImportarTagPlus()" class="bg-texto-escuro text-white px-3 py-1.5 rounded-lg text-sm hover:bg-[#1A151B] transition">TagPlus</button>
         <button onclick="app.trocarSenha()" class="bg-texto-escuro text-white px-3 py-1.5 rounded-lg text-sm hover:bg-[#1A151B] transition text-xs">Alterar senha</button>
       </div>
     </div>
@@ -122,22 +122,6 @@ const HTML = `<!DOCTYPE html>
       </div>
     </div>
 
-    <div id="dialog-tagplus" class="fixed inset-0 z-50 hidden">
-      <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" onclick="app.fecharDialogTagPlus()"></div>
-      <div class="fixed inset-0 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-gray-100">
-          <h3 class="font-bold texto-escuro text-lg mb-4">Integração TagPlus</h3>
-          <p class="texto-cinza text-xs mb-4">Informe a chave da API do TagPlus para puxar os produtos automaticamente.</p>
-          <input id="input-chave-tagplus" type="password" placeholder="Chave da API TagPlus" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-rosa outline-none text-sm mb-3">
-          <div class="flex gap-2">
-            <button onclick="app.salvarChaveTagPlus()" class="flex-1 bg-rosa text-white py-2.5 rounded-xl font-semibold hover:bg-rosa-escuro">Salvar</button>
-            <button onclick="app.fecharDialogTagPlus()" class="flex-1 bg-gray-100 texto-escuro py-2.5 rounded-xl font-semibold hover:bg-gray-200">Fechar</button>
-          </div>
-          <p id="msg-tagplus" class="mt-3 text-xs"></p>
-        </div>
-      </div>
-    </div>
-
     <div id="dialog-importar" class="fixed inset-0 z-50 hidden">
       <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" onclick="app.fecharDialogImportar()"></div>
       <div class="fixed inset-0 flex items-center justify-center p-4">
@@ -155,7 +139,6 @@ const HTML = `<!DOCTYPE html>
 
 <script>
 const STORAGE_KEY = 'carmurca_produtos';
-const CHAVE_TAGPLUS_KEY = 'carmurca_chave_tagplus';
 const SENHA_KEY = 'carmurca_senha';
 
 const app = {
@@ -349,25 +332,7 @@ const app = {
     this.mostrarMsg('Lista apagada.');
   },
 
-  abrirConfig() {
-    document.getElementById('input-chave-tagplus').value = localStorage.getItem(CHAVE_TAGPLUS_KEY) || '';
-    document.getElementById('dialog-tagplus').classList.remove('hidden');
-  },
-
-  fecharDialogTagPlus() {
-    document.getElementById('dialog-tagplus').classList.add('hidden');
-  },
-
-  salvarChaveTagPlus() {
-    const chave = document.getElementById('input-chave-tagplus').value.trim();
-    if (!chave) { document.getElementById('msg-tagplus').textContent = 'Informe a chave.'; return; }
-    localStorage.setItem(CHAVE_TAGPLUS_KEY, chave);
-    this.fecharDialogTagPlus();
-    this.mostrarMsg('Chave do TagPlus salva.');
-  },
-
   abrirImportarTagPlus() {
-    if (!localStorage.getItem(CHAVE_TAGPLUS_KEY)) { this.abrirConfig(); return; }
     document.getElementById('dialog-importar').classList.remove('hidden');
   },
 
@@ -376,20 +341,20 @@ const app = {
   },
 
   async importarTagPlus() {
-    const chave = localStorage.getItem(CHAVE_TAGPLUS_KEY);
     const msgEl = document.getElementById('msg-importar');
     msgEl.textContent = 'Buscando produtos...';
 
     try {
       const resposta = await fetch('/api/tagplus/produtos', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Tagplus-Key': chave },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
       });
 
-      if (!resposta.ok) throw new Error('Falha na sincronização');
-
-      const dados = await resposta.json();
+      const dados = await resposta.json().catch(() => ({}));
+      if (!resposta.ok) {
+        throw new Error(dados.erro || 'Falha na sincronização (HTTP ' + resposta.status + ')');
+      }
       const produtos = (dados.produtos || []).map(p => ({
         codigo: p.codigo || p.codigo_interno || p.codigo_barras || '',
         codigoBarras: p.codigo_barras || '',

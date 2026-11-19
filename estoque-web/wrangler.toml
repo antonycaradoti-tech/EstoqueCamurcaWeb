@@ -1,3 +1,5 @@
-name = "carmurca-estoque-worker"
+name = "estoquecamurcaweb"
 main = "worker.js"
 compatibility_date = "2026-01-01"
+
+[previews]

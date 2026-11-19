@@ -1,0 +1,5 @@
+name = "estoquecamurcaweb"
+main = "estoque-web/worker.js"
+compatibility_date = "2026-01-01"
+
+[previews]

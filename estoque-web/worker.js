@@ -297,7 +297,7 @@ const app = {
     const msgEl = document.getElementById('msg-codigo');
 
     if (!codigo) { msgEl.textContent = 'Digite um código.'; return; }
-    if (codigo.length > 40 || /[\s]/.test(codigo) || !/^[A-Za-z0-9._/-]+$/.test(codigo)) {
+    if (codigo.length > 40 || /[\\s]/.test(codigo) || !/^[A-Za-z0-9._/-]+$/.test(codigo)) {
       msgEl.textContent = 'Código inválido.'; return;
     }
 
@@ -332,7 +332,7 @@ const app = {
       const codigo = p.codigoBarras || p.codigoInterno || p.codigo;
       const custo = p.custo ? parseFloat(p.custo).toFixed(2).replace('.', ',') : '';
       return [codigo, p.descricao, p.quantidade, custo].join('     ');
-    }).join('\n\n');
+    }).join('\\n\\n');
     navigator.clipboard.writeText(linhas).then(() => {
       this.mostrarMsg(this.produtos.length + ' produtos copiados! Cole no Excel.');
     });
@@ -345,8 +345,8 @@ const app = {
       const custoNum = p.custo ? parseFloat(p.custo) : 0;
       const total = (custoNum * p.quantidade).toFixed(2);
       return (i+1) + ';' + codigo + ';' + p.descricao + ';' + p.quantidade + ';' + (p.custo || '') + ';' + total;
-    }).join('\n');
-    const csv = 'DATA;' + new Date().toLocaleDateString('pt-BR') + '\n\nCOD;DESCRICAO;QTD;CUSTO;TOTAL\n' + linhas;
+    }).join('\\n');
+    const csv = 'DATA;' + new Date().toLocaleDateString('pt-BR') + '\\n\\nCOD;DESCRICAO;QTD;CUSTO;TOTAL\\n' + linhas;
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

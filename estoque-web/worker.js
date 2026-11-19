@@ -465,25 +465,50 @@ async function handleTagPlus(request, env) {
     );
   }
 
-  const TAGPLUS_URL = 'https://developers.tagplus.com.br/v1/produtos';
+  const TAGPLUS_URL = 'https://api.tagplus.com.br/produtos?per_page=100';
 
   try {
     const resposta = await fetch(TAGPLUS_URL, {
-      method: 'POST',
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Authorization': 'Bearer ' + chave,
+        'X-Api-Version': '2.0',
       },
-      body: JSON.stringify({}),
     });
 
-    const dados = await resposta.json();
+    const textoResposta = await resposta.text();
+    let dados = {};
+    try {
+      dados = textoResposta ? JSON.parse(textoResposta) : {};
+    } catch {
+      throw new Error('A TagPlus retornou uma resposta que não está em JSON (HTTP ' + resposta.status + ').');
+    }
 
-    return new Response(JSON.stringify({ produtos: dados.produtos || dados.data || [] }), {
-      status: resposta.status,
+    if (!resposta.ok) {
+      const detalhe = dados.dev_message || dados.message || dados.erro || dados.error_description || dados.error || ('HTTP ' + resposta.status);
+      return new Response(JSON.stringify({
+        erro: 'TagPlus recusou a consulta: ' + detalhe,
+        status: resposta.status,
+        detalhes: dados.data || undefined,
+      }), {
+        status: resposta.status,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const produtos = Array.isArray(dados)
+      ? dados
+      : (dados.produtos || dados.data || dados.items || []);
+
+    return new Response(JSON.stringify({ produtos, total: produtos.length }), {
+      status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ erro: e.message }), { status: 502 });
+    return new Response(JSON.stringify({ erro: e.message || 'Falha ao consultar a API TagPlus.' }), {
+      status: 502,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }

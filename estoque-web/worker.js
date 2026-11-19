@@ -43,7 +43,7 @@ const HTML = `<!DOCTYPE html>
 
       <p id="msg-senha" role="status" aria-live="polite" class="mb-4 text-xs text-rosa-escuro hidden"></p>
 
-      <button id="btn-senha" onclick="app.tentarDesbloquear()" class="w-full bg-rosa text-white py-3 rounded-xl font-bold text-sm hover:bg-rosa-escuro transition shadow-md">Criar senha</button>
+      <button id="btn-senha"  class="w-full bg-rosa text-white py-3 rounded-xl font-bold text-sm hover:bg-rosa-escuro transition shadow-md">Criar senha</button>
 
       <p id="dica-senha" class="mt-4 text-xs texto-cinza text-center">No primeiro acesso, crie uma senha e confirme no campo abaixo.</p>
     </div>
@@ -156,6 +156,7 @@ const app = {
 
     const campoConfirmar = document.getElementById('campo-confirmar-senha');
     const botaoSenha = document.getElementById('btn-senha');
+    botaoSenha.addEventListener('click', () => this.tentarDesbloquear());
     const dicaSenha = document.getElementById('dica-senha');
 
     if (!temSenha) {

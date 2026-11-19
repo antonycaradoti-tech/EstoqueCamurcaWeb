@@ -1,47 +1,38 @@
-# Carmurça — Estoque Web (Cloudflare Worker)
+# Carmurça — Estoque Web
 
-App web baseado no projeto Android **Carmurça** (FBR TECH). Roda como um único **Cloudflare Worker**, que serve o HTML e faz o proxy da API do TagPlus.
+Aplicação de controle de estoque servida por um único Cloudflare Worker. O Worker entrega a interface web e faz a comunicação com a API TagPlus.
 
-## O que faz
-- Adicionar produtos por código (digitado)
-- Sincronizar produtos automaticamente com a API do **TagPlus** (substitui o CSV do app Android), incluindo o campo **custo**
-- Lista com quantidade, descrição e custo
-- Copiar lista para colar no Excel
-- Exportar CSV/planilha
-- Salva no navegador (localStorage)
-- Tela de senha para acesso restrito
+## Estrutura do repositório
 
-## Estrutura
-- `worker.js` — Worker único: serve o SPA (HTML embutido) e expõe o POST `/api/tagplus/produtos` que faz proxy para a TagPlus usando `env.TAGPLUS_API_KEY`
-- `wrangler.toml` — config do Worker
-- `README.md` — este arquivo
+Os arquivos do projeto ficam dentro de `estoque-web/` neste repositório:
 
-## Deploy
+- `estoque-web/worker.js` — aplicação web e endpoint `POST /api/tagplus/produtos`
+- `estoque-web/wrangler.toml` — configuração do Wrangler
+- `estoque-web/README.md` — estas instruções
 
-### 1. Apagar o projeto Pages antigo (opcional)
-Se quiser remover o antigo `estoquefacil-web` do Cloudflare Pages:
-- Cloudflare Dashboard → Workers & Pages → `estoquefacil-web` → Settings → Delete project
+Repositório: `antonycaradoti-tech/EstoqueCamurcaWeb`.
 
-### 2. Subir no GitHub
-Suba esta pasta (`estoque-web/`) para o seu repositório GitHub (`antoyntecaradoti-tech/estoquefacil-web`), com os 3 arquivos na **raiz** do repositório:
-- `worker.js`
-- `wrangler.toml`
-- `README.md`
+## Publicar pelo painel Cloudflare
 
-### 3. Criar o Worker no Cloudflare
-- Cloudflare Dashboard → Workers & Pages → **Create** → **Worker**
-- Escolha **Deploy from repository** → conecte o GitHub → selecione o repo `estoquefacil-web`
-- Se não tiver essa opção, crie o Worker vazio no dashboard, abra o editor e cole o conteúdo de `worker.js`
+1. Entre no [Cloudflare Dashboard](https://dash.cloudflare.com/).
+2. Abra **Workers & Pages**.
+3. Localize o Worker que já existe e que corresponde a este projeto. Não crie outro antes de confirmar se ele já existe.
+4. Abra o Worker e entre em **Edit code** (ou opção equivalente de edição).
+5. Substitua o código pelo conteúdo completo de `estoque-web/worker.js`, salve e faça **Deploy**.
+6. Em **Settings → Variables and Secrets** (o nome pode variar), confirme que existe a variável `TAGPLUS_API_KEY` como **Secret**. Não cole a chave no código nem no navegador.
+7. Em **Settings → Domains & Routes**, habilite/adicione o endereço gratuito `workers.dev`, se ainda não estiver habilitado para a conta.
+8. Depois do deploy, copie a URL `*.workers.dev` exibida pelo Cloudflare e abra no navegador.
 
-### 4. Adicionar a chave da TagPlus (segredo)
-- No seu Worker → **Settings** → **Variables** → **Environment variables**
-- Adicione `TAGPLUS_API_KEY` com sua chave da TagPlus
-- Marque como **Encrypt/Secret** (não expor no front)
+> Se o painel mostrar que não existe Worker para este projeto, pare e confirme antes de criar um novo. O objetivo é atualizar o Worker correto, não publicar uma cópia sem necessidade.
 
-### 5. Endpoint da TagPlus
-O `worker.js` já está com `TAGPLUS_URL` definido como `https://developers.tagplus.com.br/v1/produtos` (endpoint indicado pelo suporte da TagPlus). Se precisar mudar, edite a linha no `worker.js`.
+## Integração TagPlus
 
-### 6. Usar
-Acesse a URL gerada pelo Worker. Na primeira vez, crie uma senha. Cada celular/navegador guarda sua própria lista.
+O endpoint do site é `POST /api/tagplus/produtos`. O Worker lê a chave exclusivamente de `env.TAGPLUS_API_KEY`, configurada como Secret no Cloudflare. A chave não deve ser salva no localStorage nem enviada pelo navegador.
 
-> shortcut: o `functions/api-tagplus.js` e o antigo `wrangler.toml` do Pages não são mais usados — o Worker substitui ambos.
+O endpoint remoto configurado no código é `https://developers.tagplus.com.br/v1/produtos`.
+
+## Observações
+
+- Os produtos e a senha são armazenados no navegador por meio de `localStorage`; cada navegador/dispositivo mantém seus próprios dados.
+- O primeiro acesso solicita a criação de uma senha local.
+- Publicar o código no GitHub, por si só, não publica o Worker no Cloudflare. É necessário fazer o deploy no painel ou por uma integração de CI/CD configurada.

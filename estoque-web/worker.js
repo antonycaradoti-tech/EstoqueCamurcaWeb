@@ -431,6 +431,8 @@ const app = {
   }
 };
 
+// Expõe o app para os botões inline e inicializa a tela.
+window.app = app;
 app.init();
 </script>
 
@@ -446,7 +448,10 @@ export default {
     }
 
     return new Response(HTML, {
-      headers: { 'Content-Type': 'text/html;charset=UTF-8' },
+      headers: {
+        'Content-Type': 'text/html;charset=UTF-8',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+      },
     });
   },
 };

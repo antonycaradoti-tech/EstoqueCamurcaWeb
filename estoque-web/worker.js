@@ -33,14 +33,19 @@ const HTML = `<!DOCTYPE html>
 
       <div class="mb-4">
         <label class="block text-xs texto-cinza mb-1">Senha</label>
-        <input id="input-senha" type="password" placeholder="••••••" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-rosa outline-none text-sm">
+        <input id="input-senha" type="password" autocomplete="new-password" placeholder="Crie uma senha (mínimo 4 caracteres)" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-rosa outline-none text-sm">
       </div>
 
-      <p id="msg-senha" class="mb-4 text-xs text-rosa-escuro hidden"></p>
+      <div id="campo-confirmar-senha" class="mb-4 hidden">
+        <label class="block text-xs texto-cinza mb-1">Confirme a senha</label>
+        <input id="input-confirmar-senha" type="password" autocomplete="new-password" placeholder="Digite a mesma senha novamente" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-rosa outline-none text-sm">
+      </div>
 
-      <button onclick="app.tentarDesbloquear()" class="w-full bg-rosa text-white py-3 rounded-xl font-bold text-sm hover:bg-rosa-escuro transition shadow-md">Desbloquear</button>
+      <p id="msg-senha" role="status" aria-live="polite" class="mb-4 text-xs text-rosa-escuro hidden"></p>
 
-      <p class="mt-4 text-xs texto-cinza text-center">Primeira vez? A senha será criada ao digitar qualquer coisa aqui.</p>
+      <button id="btn-senha" onclick="app.tentarDesbloquear()" class="w-full bg-rosa text-white py-3 rounded-xl font-bold text-sm hover:bg-rosa-escuro transition shadow-md">Criar senha</button>
+
+      <p id="dica-senha" class="mt-4 text-xs texto-cinza text-center">No primeiro acesso, crie uma senha e confirme no campo abaixo.</p>
     </div>
   </div>
 
@@ -149,14 +154,26 @@ const app = {
     const telaSenha = document.getElementById('tela-senha');
     const appPrincipal = document.getElementById('app-principal');
 
+    const campoConfirmar = document.getElementById('campo-confirmar-senha');
+    const botaoSenha = document.getElementById('btn-senha');
+    const dicaSenha = document.getElementById('dica-senha');
+
     if (!temSenha) {
       document.getElementById('titulo-senha').textContent = 'Primeiro acesso';
       document.getElementById('subtitulo-senha').textContent = 'Crie uma senha para proteger seu estoque';
       document.getElementById('input-senha').placeholder = 'Nova senha';
+      document.getElementById('input-senha').autocomplete = 'new-password';
+      campoConfirmar.classList.remove('hidden');
+      botaoSenha.textContent = 'Criar senha';
+      dicaSenha.textContent = 'Escolha uma senha com pelo menos 4 caracteres e confirme abaixo.';
     } else {
       document.getElementById('titulo-senha').textContent = 'Acesso ao Estoque';
       document.getElementById('subtitulo-senha').textContent = 'Digite sua senha para continuar';
-      document.getElementById('input-senha').placeholder = '••••••';
+      document.getElementById('input-senha').placeholder = 'Digite sua senha';
+      document.getElementById('input-senha').autocomplete = 'current-password';
+      campoConfirmar.classList.add('hidden');
+      botaoSenha.textContent = 'Entrar';
+      dicaSenha.textContent = 'Digite sua senha cadastrada para acessar o estoque.';
     }
 
     telaSenha.classList.remove('hidden');
@@ -172,27 +189,50 @@ const app = {
   },
 
   tentarDesbloquear() {
-    const senha = document.getElementById('input-senha').value;
+    const senhaEl = document.getElementById('input-senha');
+    const confirmarEl = document.getElementById('input-confirmar-senha');
     const msgEl = document.getElementById('msg-senha');
+    const senha = senhaEl.value;
     const jaTem = localStorage.getItem(SENHA_KEY);
+
+    msgEl.classList.remove('hidden');
+    msgEl.style.color = '#B80E6D';
 
     if (!senha || senha.length < 4) {
       msgEl.textContent = 'A senha precisa ter pelo menos 4 caracteres.';
-      msgEl.classList.remove('hidden');
+      senhaEl.focus();
       return;
     }
 
     if (!jaTem) {
-      localStorage.setItem(SENHA_KEY, senha);
-      msgEl.textContent = 'Senha criada com sucesso!';
-      msgEl.style.color = '#B80E6D';
-      setTimeout(() => this.liberarApp(), 800);
+      if (senha !== confirmarEl.value) {
+        msgEl.textContent = 'As senhas não conferem. Digite a mesma senha nos dois campos.';
+        confirmarEl.value = '';
+        confirmarEl.focus();
+        return;
+      }
+
+      try {
+        localStorage.setItem(SENHA_KEY, senha);
+        if (localStorage.getItem(SENHA_KEY) !== senha) {
+          throw new Error('Não foi possível confirmar o salvamento.');
+        }
+      } catch (e) {
+        msgEl.textContent = 'Não foi possível salvar a senha neste navegador. Verifique as configurações de armazenamento e tente novamente.';
+        return;
+      }
+
+      msgEl.textContent = 'Senha criada e salva com sucesso! Abrindo seu estoque...';
+      senhaEl.disabled = true;
+      confirmarEl.disabled = true;
+      document.getElementById('btn-senha').disabled = true;
+      setTimeout(() => this.liberarApp(), 1000);
     } else if (senha === jaTem) {
       this.liberarApp();
     } else {
-      msgEl.textContent = 'Senha incorreta.';
-      msgEl.classList.remove('hidden');
-      document.getElementById('input-senha').value = '';
+      msgEl.textContent = 'Senha incorreta. Confira e tente novamente.';
+      senhaEl.value = '';
+      senhaEl.focus();
     }
   },
 

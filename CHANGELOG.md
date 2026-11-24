@@ -14,9 +14,9 @@
 - Pendência principal: resposta oficial da TagPlus.
 
 ## Complemento da revisão de 2026-11-24
-- Achado adicional no Worker: a string HTML contém escapes duplicados em validação de código e em delimitadores de linhas da cópia/exportação. O efeito precisa ser confirmado por teste no navegador; tarefa UI-003 criada.
+- Correção da revisão: a suspeita anterior sobre escapes duplicados foi descartada após considerar a string HTML como template literal JavaScript; os escapes são necessários para preservar regex e quebras de linha no script entregue ao navegador. UI-003 foi redefinida como teste de regressão, não como bug confirmado.
 - Divergência documental: `estoque-web/README.md` ainda descreve endpoint legado `developers.tagplus.com.br/v1/produtos`, enquanto o Worker revisado consulta `api.tagplus.com.br/produtos?per_page=100`; tarefa DOC-001 criada.
-- A interface insere campos retornados da TagPlus em `innerHTML`; tarefa SEC-003 cobre correção.
+- A interface insere campos retornados da TagPlus em `innerHTML`; tarefa SEC-003 cobre correção.\n- O importador atribui quantidade zero aos novos itens e ignora os já existentes, portanto não atualiza cadastro de itens importados anteriormente; criada API-006 para definir atualização sem perder contagem local.\n- Usuário confirmou escopo: loja principal e uso exclusivo por ele; roadmap e arquitetura foram simplificados, sem multi-loja ou multiusuário.\n- Nova revisão da documentação oficial TagPlus confirma `GET /produtos`, `X-Api-Version: 2.0`, `Authorization: Bearer` para OAuth2, paginação por `page`/`per_page` e escopo `read:produtos`. A documentação pública consultada não esclarece como Personal Access Token deve identificar o consumidor; integração permanece bloqueada aguardando suporte.
 - Documentos de continuidade criados na branch: `PROJECT_STATE.md`, `ROADMAP.md`, `PROJECT_MAP.md`, `DECISIONS.md`, `CHANGELOG.md`.
 - Nenhum arquivo de aplicação foi modificado e nenhum deploy/merge foi executado nesta revisão.
 
@@ -24,3 +24,11 @@
 - Preview build/deploy registrados para commits `182b7a1`, `8e53b4f` e `586e5ec`.
 - Usuário confirmou que login/primeiro acesso funcionou no Preview após as correções de interface.
 - A integração TagPlus ainda não foi validada funcionalmente.
+
+
+## 2026-11-24 — Escopo refinado e diagnóstico TagPlus
+- Recuperado histórico: Personal Access Token criado pelo usuário com permissões `read:produtos`, `read:relatorio_estoque`, `read:me`; o valor foi copiado para o Secret `TAGPLUS_API_KEY` no Cloudflare Preview.
+- Teste mais recente passou da falha local de secret ausente e chegou ao serviço remoto, que retornou `An authentication plugin must be enabled and the consumer must be identified too`.
+- Documentação pública da API v2 confirma host `api.tagplus.com.br`, GET `/produtos`, cabeçalho `X-Api-Version: 2.0`, Bearer para Access Token OAuth2, paginação `page`/ `per_page`, e escopo `read:produtos`. Não foi localizada orientação oficial pública que diga como usar o Personal Access Token no mesmo fluxo nem como identificar o consumer; resposta do suporte é necessária.
+- O Worker não implementa paginação (consulta somente `per_page=100`, página padrão) e o importador não atualiza produtos existentes. API-004/API-006 registram essas melhorias.
+- Nenhum código da aplicação foi alterado; nenhuma publicação ou merge foi executado.

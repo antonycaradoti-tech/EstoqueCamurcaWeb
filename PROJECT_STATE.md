@@ -9,8 +9,8 @@ Aplicação web de apoio à contagem/conferência de produtos da loja principal,
 - Repositório: `antonycaradoti-tech/EstoqueCamurcaWeb`
 - Branch revisada: `fix/primeiro-acesso-tagplus-2026-11-19`
 - Commit de código revisado: `586e5ec6a09047feb2ba10b3778f4a6d19a583ec`
-- Último commit observado na branch: `275141210793ee732e6d098eb5e543816ef08d97`.
-- Comparação com `main`: branch 21 commits à frente e 0 atrás antes desta atualização documental; conferir novamente após commits.
+- O PR #1 é a referência para o head atual da branch; a auditoria documental foi atualizada em 2026-11-24.
+- Comparação com `main`: branch 31 commits à frente e 0 atrás na conferência imediatamente anterior à última atualização documental; `main` não recebeu alterações.
 - PR #1: aberto e em Draft; não mesclado.
 - Arquivos de aplicação: `estoque-web/worker.js`, `estoque-web/wrangler.toml`, `estoque-web/README.md`, mais `wrangler.toml` na raiz.
 
@@ -31,7 +31,7 @@ Aplicação web de apoio à contagem/conferência de produtos da loja principal,
 - Segurança da API: BACKLOG — endpoint de produtos não tem autenticação própria.
 - Segurança da interface: BACKLOG — senha armazenada em texto puro no localStorage; campos de produto são interpolados em innerHTML.
 - Persistência: BACKLOG — produtos armazenados apenas no localStorage de cada navegador.
-- Qualidade: BACKLOG — não foram encontrados scripts ou suíte de testes no diretório revisado.
+- Qualidade: BACKLOG — não foram encontrados scripts ou suíte de testes no diretório revisado. A suspeita anterior sobre escapes foi descartada; UI-003 agora é somente validação de regressão.
 - CI/CD: VALIDATING — PR e Preview existem; fluxo de produção/build deve ser reavaliado separadamente.
 
 ## Bloqueios e riscos

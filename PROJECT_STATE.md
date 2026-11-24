@@ -3,14 +3,14 @@
 Última revisão: 2026-11-24
 
 ## Objetivo e escopo confirmado
-Aplicação web de controle de estoque servida por um Cloudflare Worker, com interface no navegador e integração planejada para consultar produtos da TagPlus. O escopo futuro de múltiplas lojas, sincronização entre dispositivos e atualizações automáticas ainda precisa ser confirmado antes de implementação.
+Aplicação web de apoio à contagem/conferência de produtos da loja principal, servida por um Cloudflare Worker e integrada à conta TagPlus dessa loja. Escopo confirmado pelo usuário em 2026-11-24: uma loja (principal), um usuário (o próprio usuário). Não desenvolver multi-loja, multiusuário ou permissões por funcionário.
 
 ## Repositório e versão observados
 - Repositório: `antonycaradoti-tech/EstoqueCamurcaWeb`
 - Branch revisada: `fix/primeiro-acesso-tagplus-2026-11-19`
 - Commit de código revisado: `586e5ec6a09047feb2ba10b3778f4a6d19a583ec`
 - Último commit observado na branch: `275141210793ee732e6d098eb5e543816ef08d97`.
-- Comparação com `main`: branch 20 commits à frente e 0 atrás na conferência de 2026-11-24.
+- Comparação com `main`: branch 21 commits à frente e 0 atrás antes desta atualização documental; conferir novamente após commits.
 - PR #1: aberto e em Draft; não mesclado.
 - Arquivos de aplicação: `estoque-web/worker.js`, `estoque-web/wrangler.toml`, `estoque-web/README.md`, mais `wrangler.toml` na raiz.
 
@@ -19,6 +19,12 @@ Aplicação web de controle de estoque servida por um Cloudflare Worker, com int
 - Preview do commit `586e5ec`: comentário automático do Cloudflare no PR registra build e deploy bem-sucedidos em 2026-11-19.
 - Integração TagPlus: NÃO concluída. Teste mais recente informado pelo usuário retorna: `An authentication plugin must be enabled and the consumer must be identified too`.
 - Produção: não foi alterada nesta revisão. Estado de produção citado anteriormente na conversa não foi reconsultado em 2026-11-24.
+
+## Escopo e premissas funcionais
+- A conta TagPlus consultada é somente a da loja principal.
+- A aplicação é usada por uma única pessoa; não criar cadastro de funcionários, seleção de lojas ou papéis de usuário.
+- A interface importa o catálogo TagPlus e permite adicionar/contar quantidades localmente; confirmar com o usuário se quantidade representa contagem física, pois o código atual inicia a quantidade importada em zero.
+- Não há requisito confirmado de acesso em múltiplos dispositivos; manter solução simples enquanto o uso for no mesmo navegador.
 
 ## Estado atual
 - Integração TagPlus: BLOCKED — aguardando resposta oficial da TagPlus para confirmar autenticação e endpoint adequados ao Personal Access Token.
@@ -33,10 +39,10 @@ Aplicação web de controle de estoque servida por um Cloudflare Worker, com int
 2. Não expor tokens, segredos ou senhas no GitHub, código do navegador ou logs.
 3. Não mesclar o PR nem publicar em produção sem autorização explícita do usuário.
 4. A senha local não deve ser tratada como controle de acesso real à API.
-5. Confirmar requisitos para várias lojas, usuários, dispositivos, volumes e frequência de sincronização.
+5. Proteger o endpoint mesmo com um único usuário; decidir autenticação simples no servidor (por exemplo, Cloudflare Access para uma identidade) antes de produção.
 
 ## Próximo passo único
-Obter e analisar a resposta da TagPlus sobre Personal Access Tokens, autenticação exigida, identificação do consumidor e endpoint de listagem de produtos.
+Aguardar e analisar a resposta oficial da TagPlus sobre como autenticar Personal Access Tokens na API v2 e como identificar o consumidor; só então alterar a chamada no Worker.
 
 ## Arquivos a ler ao retomar
 1. `PROJECT_STATE.md`

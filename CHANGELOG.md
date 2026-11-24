@@ -13,7 +13,7 @@
 - Impacto: nenhum código da aplicação alterado nesta revisão; documentação de continuidade criada.
 - Pendência principal: resposta oficial da TagPlus.
 
-## 2026-11-19 — Histórico de Preview (evidência no comentário automático do PR)
+## Complemento da revisão de 2026-11-24\n- Achado adicional no Worker: a string HTML contém escapes duplicados em validação de código e em delimitadores de linhas da cópia/exportação. O efeito precisa ser confirmado por teste no navegador; tarefa UI-003 criada.\n- Divergência documental: `estoque-web/README.md` ainda descreve endpoint legado `developers.tagplus.com.br/v1/produtos`, enquanto o Worker revisado consulta `api.tagplus.com.br/produtos?per_page=100`; tarefa DOC-001 criada.\n- A interface insere campos retornados da TagPlus em `innerHTML`; tarefa SEC-003 cobre correção.\n- Documentos de continuidade criados na branch: `PROJECT_STATE.md`, `ROADMAP.md`, `PROJECT_MAP.md`, `DECISIONS.md`, `CHANGELOG.md`.\n- Nenhum arquivo de aplicação foi modificado e nenhum deploy/merge foi executado nesta revisão.\n\n## 2026-11-19 — Histórico de Preview (evidência no comentário automático do PR)
 - Preview build/deploy registrados para commits `182b7a1`, `8e53b4f` e `586e5ec`.
 - Usuário confirmou que login/primeiro acesso funcionou no Preview após as correções de interface.
 - A integração TagPlus ainda não foi validada funcionalmente.

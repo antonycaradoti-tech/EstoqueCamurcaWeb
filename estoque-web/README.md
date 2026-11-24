@@ -31,14 +31,7 @@ O endpoint do site é `POST /api/tagplus/produtos`. O Worker lê a chave exclusi
 
 O endpoint remoto atualmente configurado no código é `https://api.tagplus.com.br/produtos?per_page=100`, usando `GET`, `Authorization: Bearer ...` e `X-Api-Version: 2.0`. A autenticação com o Personal Access Token criado no painel TagPlus ainda está em validação: o teste atual retorna `An authentication plugin must be enabled and the consumer must be identified too`. Não considerar a integração concluída até a TagPlus confirmar o mecanismo correto para esse tipo de token.
 
-## Escopo atual
-
-- Uma única loja: loja principal.
-- Um único usuário: o próprio responsável pelo sistema.
-- Não há cadastro de outras lojas ou usuários.
-- A interface mantém a lista/contagem no navegador; não há banco de dados central.
-
-## Observações
+## Escopo atual\n\n- Uma única loja: loja principal.\n- Um único usuário: o próprio responsável pelo sistema.\n- Não há cadastro de outras lojas ou usuários.\n- A interface mantém a lista/contagem no navegador; não há banco de dados central.\n\n## Observações
 
 - Os produtos e a senha são armazenados no navegador por meio de `localStorage`; cada navegador/dispositivo mantém seus próprios dados.
 - O primeiro acesso solicita a criação de uma senha local.

@@ -8,8 +8,8 @@ Aplicação web de controle de estoque servida por um Cloudflare Worker, com int
 ## Repositório e versão observados
 - Repositório: `antonycaradoti-tech/EstoqueCamurcaWeb`
 - Branch revisada: `fix/primeiro-acesso-tagplus-2026-11-19`
-- Commit observado na branch: `586e5ec6a09047feb2ba10b3778f4a6d19a583ec`
-- Comparação com `main`: branch 10 commits à frente e 0 atrás na conferência de 2026-11-24.
+- Commit de código revisado: `586e5ec6a09047feb2ba10b3778f4a6d19a583ec`\n- Último commit da branch após criação dos documentos: `3c6c6b3e9e40839c5871b2023ebfaa76d2b1b3f4` (a revisão do PR confirmou esse head antes do ajuste final do changelog).
+- Comparação com `main`: branch 18 commits à frente e 0 atrás na conferência de 2026-11-24 na conferência de 2026-11-24.
 - PR #1: aberto e em Draft; não mesclado.
 - Arquivos de aplicação: `estoque-web/worker.js`, `estoque-web/wrangler.toml`, `estoque-web/README.md`, mais `wrangler.toml` na raiz.
 

@@ -33,14 +33,19 @@ const HTML = `<!DOCTYPE html>
 
       <div class="mb-4">
         <label class="block text-xs texto-cinza mb-1">Senha</label>
-        <input id="input-senha" type="password" placeholder="••••••" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-rosa outline-none text-sm">
+        <input id="input-senha" type="password" autocomplete="new-password" placeholder="Crie uma senha (mínimo 4 caracteres)" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-rosa outline-none text-sm">
       </div>
 
-      <p id="msg-senha" class="mb-4 text-xs text-rosa-escuro hidden"></p>
+      <div id="campo-confirmar-senha" class="mb-4 hidden">
+        <label class="block text-xs texto-cinza mb-1">Confirme a senha</label>
+        <input id="input-confirmar-senha" type="password" autocomplete="new-password" placeholder="Digite a mesma senha novamente" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-rosa outline-none text-sm">
+      </div>
 
-      <button onclick="app.tentarDesbloquear()" class="w-full bg-rosa text-white py-3 rounded-xl font-bold text-sm hover:bg-rosa-escuro transition shadow-md">Desbloquear</button>
+      <p id="msg-senha" role="status" aria-live="polite" class="mb-4 text-xs text-rosa-escuro hidden"></p>
 
-      <p class="mt-4 text-xs texto-cinza text-center">Primeira vez? A senha será criada ao digitar qualquer coisa aqui.</p>
+      <button id="btn-senha"  class="w-full bg-rosa text-white py-3 rounded-xl font-bold text-sm hover:bg-rosa-escuro transition shadow-md">Criar senha</button>
+
+      <p id="dica-senha" class="mt-4 text-xs texto-cinza text-center">No primeiro acesso, crie uma senha e confirme no campo abaixo.</p>
     </div>
   </div>
 
@@ -59,7 +64,7 @@ const HTML = `<!DOCTYPE html>
 
       <div class="flex items-center gap-3 mt-4 md:mt-0">
         <span id="badge-total" class="bg-rosa text-white px-3 py-1.5 rounded-full font-bold text-sm">0 itens</span>
-        <button onclick="app.abrirConfig()" class="bg-texto-escuro text-white px-3 py-1.5 rounded-lg text-sm hover:bg-[#1A151B] transition">TagPlus</button>
+        <button onclick="app.abrirImportarTagPlus()" class="bg-texto-escuro text-white px-3 py-1.5 rounded-lg text-sm hover:bg-[#1A151B] transition">TagPlus</button>
         <button onclick="app.trocarSenha()" class="bg-texto-escuro text-white px-3 py-1.5 rounded-lg text-sm hover:bg-[#1A151B] transition text-xs">Alterar senha</button>
       </div>
     </div>
@@ -122,22 +127,6 @@ const HTML = `<!DOCTYPE html>
       </div>
     </div>
 
-    <div id="dialog-tagplus" class="fixed inset-0 z-50 hidden">
-      <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" onclick="app.fecharDialogTagPlus()"></div>
-      <div class="fixed inset-0 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-gray-100">
-          <h3 class="font-bold texto-escuro text-lg mb-4">Integração TagPlus</h3>
-          <p class="texto-cinza text-xs mb-4">Informe a chave da API do TagPlus para puxar os produtos automaticamente.</p>
-          <input id="input-chave-tagplus" type="password" placeholder="Chave da API TagPlus" class="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-rosa outline-none text-sm mb-3">
-          <div class="flex gap-2">
-            <button onclick="app.salvarChaveTagPlus()" class="flex-1 bg-rosa text-white py-2.5 rounded-xl font-semibold hover:bg-rosa-escuro">Salvar</button>
-            <button onclick="app.fecharDialogTagPlus()" class="flex-1 bg-gray-100 texto-escuro py-2.5 rounded-xl font-semibold hover:bg-gray-200">Fechar</button>
-          </div>
-          <p id="msg-tagplus" class="mt-3 text-xs"></p>
-        </div>
-      </div>
-    </div>
-
     <div id="dialog-importar" class="fixed inset-0 z-50 hidden">
       <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" onclick="app.fecharDialogImportar()"></div>
       <div class="fixed inset-0 flex items-center justify-center p-4">
@@ -155,7 +144,6 @@ const HTML = `<!DOCTYPE html>
 
 <script>
 const STORAGE_KEY = 'carmurca_produtos';
-const CHAVE_TAGPLUS_KEY = 'carmurca_chave_tagplus';
 const SENHA_KEY = 'carmurca_senha';
 
 const app = {
@@ -166,14 +154,27 @@ const app = {
     const telaSenha = document.getElementById('tela-senha');
     const appPrincipal = document.getElementById('app-principal');
 
+    const campoConfirmar = document.getElementById('campo-confirmar-senha');
+    const botaoSenha = document.getElementById('btn-senha');
+    botaoSenha.addEventListener('click', () => this.tentarDesbloquear());
+    const dicaSenha = document.getElementById('dica-senha');
+
     if (!temSenha) {
       document.getElementById('titulo-senha').textContent = 'Primeiro acesso';
       document.getElementById('subtitulo-senha').textContent = 'Crie uma senha para proteger seu estoque';
       document.getElementById('input-senha').placeholder = 'Nova senha';
+      document.getElementById('input-senha').autocomplete = 'new-password';
+      campoConfirmar.classList.remove('hidden');
+      botaoSenha.textContent = 'Criar senha';
+      dicaSenha.textContent = 'Escolha uma senha com pelo menos 4 caracteres e confirme abaixo.';
     } else {
       document.getElementById('titulo-senha').textContent = 'Acesso ao Estoque';
       document.getElementById('subtitulo-senha').textContent = 'Digite sua senha para continuar';
-      document.getElementById('input-senha').placeholder = '••••••';
+      document.getElementById('input-senha').placeholder = 'Digite sua senha';
+      document.getElementById('input-senha').autocomplete = 'current-password';
+      campoConfirmar.classList.add('hidden');
+      botaoSenha.textContent = 'Entrar';
+      dicaSenha.textContent = 'Digite sua senha cadastrada para acessar o estoque.';
     }
 
     telaSenha.classList.remove('hidden');
@@ -189,27 +190,50 @@ const app = {
   },
 
   tentarDesbloquear() {
-    const senha = document.getElementById('input-senha').value;
+    const senhaEl = document.getElementById('input-senha');
+    const confirmarEl = document.getElementById('input-confirmar-senha');
     const msgEl = document.getElementById('msg-senha');
+    const senha = senhaEl.value;
     const jaTem = localStorage.getItem(SENHA_KEY);
+
+    msgEl.classList.remove('hidden');
+    msgEl.style.color = '#B80E6D';
 
     if (!senha || senha.length < 4) {
       msgEl.textContent = 'A senha precisa ter pelo menos 4 caracteres.';
-      msgEl.classList.remove('hidden');
+      senhaEl.focus();
       return;
     }
 
     if (!jaTem) {
-      localStorage.setItem(SENHA_KEY, senha);
-      msgEl.textContent = 'Senha criada com sucesso!';
-      msgEl.style.color = '#B80E6D';
-      setTimeout(() => this.liberarApp(), 800);
+      if (senha !== confirmarEl.value) {
+        msgEl.textContent = 'As senhas não conferem. Digite a mesma senha nos dois campos.';
+        confirmarEl.value = '';
+        confirmarEl.focus();
+        return;
+      }
+
+      try {
+        localStorage.setItem(SENHA_KEY, senha);
+        if (localStorage.getItem(SENHA_KEY) !== senha) {
+          throw new Error('Não foi possível confirmar o salvamento.');
+        }
+      } catch (e) {
+        msgEl.textContent = 'Não foi possível salvar a senha neste navegador. Verifique as configurações de armazenamento e tente novamente.';
+        return;
+      }
+
+      msgEl.textContent = 'Senha criada e salva com sucesso! Abrindo seu estoque...';
+      senhaEl.disabled = true;
+      confirmarEl.disabled = true;
+      document.getElementById('btn-senha').disabled = true;
+      setTimeout(() => this.liberarApp(), 1000);
     } else if (senha === jaTem) {
       this.liberarApp();
     } else {
-      msgEl.textContent = 'Senha incorreta.';
-      msgEl.classList.remove('hidden');
-      document.getElementById('input-senha').value = '';
+      msgEl.textContent = 'Senha incorreta. Confira e tente novamente.';
+      senhaEl.value = '';
+      senhaEl.focus();
     }
   },
 
@@ -274,7 +298,7 @@ const app = {
     const msgEl = document.getElementById('msg-codigo');
 
     if (!codigo) { msgEl.textContent = 'Digite um código.'; return; }
-    if (codigo.length > 40 || /[\s]/.test(codigo) || !/^[A-Za-z0-9._/-]+$/.test(codigo)) {
+    if (codigo.length > 40 || /[\\s]/.test(codigo) || !/^[A-Za-z0-9._/-]+$/.test(codigo)) {
       msgEl.textContent = 'Código inválido.'; return;
     }
 
@@ -309,7 +333,7 @@ const app = {
       const codigo = p.codigoBarras || p.codigoInterno || p.codigo;
       const custo = p.custo ? parseFloat(p.custo).toFixed(2).replace('.', ',') : '';
       return [codigo, p.descricao, p.quantidade, custo].join('     ');
-    }).join('\n\n');
+    }).join('\\n\\n');
     navigator.clipboard.writeText(linhas).then(() => {
       this.mostrarMsg(this.produtos.length + ' produtos copiados! Cole no Excel.');
     });
@@ -322,8 +346,8 @@ const app = {
       const custoNum = p.custo ? parseFloat(p.custo) : 0;
       const total = (custoNum * p.quantidade).toFixed(2);
       return (i+1) + ';' + codigo + ';' + p.descricao + ';' + p.quantidade + ';' + (p.custo || '') + ';' + total;
-    }).join('\n');
-    const csv = 'DATA;' + new Date().toLocaleDateString('pt-BR') + '\n\nCOD;DESCRICAO;QTD;CUSTO;TOTAL\n' + linhas;
+    }).join('\\n');
+    const csv = 'DATA;' + new Date().toLocaleDateString('pt-BR') + '\\n\\nCOD;DESCRICAO;QTD;CUSTO;TOTAL\\n' + linhas;
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -349,25 +373,7 @@ const app = {
     this.mostrarMsg('Lista apagada.');
   },
 
-  abrirConfig() {
-    document.getElementById('input-chave-tagplus').value = localStorage.getItem(CHAVE_TAGPLUS_KEY) || '';
-    document.getElementById('dialog-tagplus').classList.remove('hidden');
-  },
-
-  fecharDialogTagPlus() {
-    document.getElementById('dialog-tagplus').classList.add('hidden');
-  },
-
-  salvarChaveTagPlus() {
-    const chave = document.getElementById('input-chave-tagplus').value.trim();
-    if (!chave) { document.getElementById('msg-tagplus').textContent = 'Informe a chave.'; return; }
-    localStorage.setItem(CHAVE_TAGPLUS_KEY, chave);
-    this.fecharDialogTagPlus();
-    this.mostrarMsg('Chave do TagPlus salva.');
-  },
-
   abrirImportarTagPlus() {
-    if (!localStorage.getItem(CHAVE_TAGPLUS_KEY)) { this.abrirConfig(); return; }
     document.getElementById('dialog-importar').classList.remove('hidden');
   },
 
@@ -376,20 +382,20 @@ const app = {
   },
 
   async importarTagPlus() {
-    const chave = localStorage.getItem(CHAVE_TAGPLUS_KEY);
     const msgEl = document.getElementById('msg-importar');
     msgEl.textContent = 'Buscando produtos...';
 
     try {
       const resposta = await fetch('/api/tagplus/produtos', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Tagplus-Key': chave },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
       });
 
-      if (!resposta.ok) throw new Error('Falha na sincronização');
-
-      const dados = await resposta.json();
+      const dados = await resposta.json().catch(() => ({}));
+      if (!resposta.ok) {
+        throw new Error(dados.erro || 'Falha na sincronização (HTTP ' + resposta.status + ')');
+      }
       const produtos = (dados.produtos || []).map(p => ({
         codigo: p.codigo || p.codigo_interno || p.codigo_barras || '',
         codigoBarras: p.codigo_barras || '',
@@ -425,6 +431,8 @@ const app = {
   }
 };
 
+// Expõe o app para os botões inline e inicializa a tela.
+window.app = app;
 app.init();
 </script>
 
@@ -440,7 +448,10 @@ export default {
     }
 
     return new Response(HTML, {
-      headers: { 'Content-Type': 'text/html;charset=UTF-8' },
+      headers: {
+        'Content-Type': 'text/html;charset=UTF-8',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+      },
     });
   },
 };
@@ -454,25 +465,50 @@ async function handleTagPlus(request, env) {
     );
   }
 
-  const TAGPLUS_URL = 'https://developers.tagplus.com.br/v1/produtos';
+  const TAGPLUS_URL = 'https://api.tagplus.com.br/produtos?per_page=100';
 
   try {
     const resposta = await fetch(TAGPLUS_URL, {
-      method: 'POST',
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Authorization': 'Bearer ' + chave,
+        'X-Api-Version': '2.0',
       },
-      body: JSON.stringify({}),
     });
 
-    const dados = await resposta.json();
+    const textoResposta = await resposta.text();
+    let dados = {};
+    try {
+      dados = textoResposta ? JSON.parse(textoResposta) : {};
+    } catch {
+      throw new Error('A TagPlus retornou uma resposta que não está em JSON (HTTP ' + resposta.status + ').');
+    }
 
-    return new Response(JSON.stringify({ produtos: dados.produtos || dados.data || [] }), {
-      status: resposta.status,
+    if (!resposta.ok) {
+      const detalhe = dados.dev_message || dados.message || dados.erro || dados.error_description || dados.error || ('HTTP ' + resposta.status);
+      return new Response(JSON.stringify({
+        erro: 'TagPlus recusou a consulta: ' + detalhe,
+        status: resposta.status,
+        detalhes: dados.data || undefined,
+      }), {
+        status: resposta.status,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const produtos = Array.isArray(dados)
+      ? dados
+      : (dados.produtos || dados.data || dados.items || []);
+
+    return new Response(JSON.stringify({ produtos, total: produtos.length }), {
+      status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ erro: e.message }), { status: 502 });
+    return new Response(JSON.stringify({ erro: e.message || 'Falha ao consultar a API TagPlus.' }), {
+      status: 502,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }

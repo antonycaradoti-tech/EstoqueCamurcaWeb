@@ -15,7 +15,7 @@
 
 ## Complemento da revisão de 2026-11-24
 - Correção da revisão: a suspeita anterior sobre escapes duplicados foi descartada após considerar a string HTML como template literal JavaScript; os escapes são necessários para preservar regex e quebras de linha no script entregue ao navegador. UI-003 foi redefinida como teste de regressão, não como bug confirmado.
-- Divergência documental: `estoque-web/README.md` ainda descreve endpoint legado `developers.tagplus.com.br/v1/produtos`, enquanto o Worker revisado consulta `api.tagplus.com.br/produtos?per_page=100`; tarefa DOC-001 criada.
+- Divergência documental identificada e corrigida nesta revisão: README agora descreve `api.tagplus.com.br/produtos?per_page=100`, GET e headers presentes no Worker, sem declarar a autenticação PAT como funcional; DOC-001 concluída.
 - A interface insere campos retornados da TagPlus em `innerHTML`; tarefa SEC-003 cobre correção.
 - O importador atribui quantidade zero aos novos itens e ignora os já existentes, portanto não atualiza cadastro de itens importados anteriormente; criada API-006 para definir atualização sem perder contagem local.
 - Usuário confirmou escopo: loja principal e uso exclusivo por ele; roadmap e arquitetura foram simplificados, sem multi-loja ou multiusuário.

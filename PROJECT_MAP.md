@@ -2,7 +2,8 @@
 
 ```mermaid
 flowchart TD
-  USER[Único usuário] --> UI[Interface web no navegador]\n  STORE[Conta TagPlus da loja principal] --> TAG[API TagPlus]
+  USER[Único usuário] --> UI[Interface web no navegador]
+  STORE[Conta TagPlus da loja principal] --> TAG[API TagPlus]
   UI --> LOCAL[localStorage atual]
   UI -->|POST /api/tagplus/produtos| WORKER[Cloudflare Worker]
   WORKER --> SECRET[Secret TAGPLUS_API_KEY]
@@ -14,13 +15,15 @@ flowchart TD
     AUTH[SEC-001: autenticação do endpoint — BACKLOG]
     PASS[SEC-002: senha local em texto puro — BACKLOG]
     XSS[SEC-003: renderização innerHTML — BACKLOG]
-    BACKUP[DATA-003: backup/restauração local — READY]\n    POLICY[API-006: atualizar catálogo sem perder contagem — BACKLOG]
+    BACKUP[DATA-003: backup/restauração local — READY]
+    POLICY[API-006: atualizar catálogo sem perder contagem — BACKLOG]
   end
 
   WORKER -.-> AUTH
   UI -.-> PASS
   UI -.-> XSS
-  LOCAL -.-> BACKUP\n  UI -.-> POLICY
+  LOCAL -.-> BACKUP
+  UI -.-> POLICY
 
   API1[API-001: confirmar autenticação TagPlus — BLOCKED] --> API2[API-002: confirmar contrato e paginação — BLOCKED]
   API2 --> API3[API-003: implementar integração — BACKLOG]
@@ -30,7 +33,12 @@ flowchart TD
   PREVIEW --> PROD[DEP-003: produção com aprovação — BLOCKED]
 ```
 
-## Escopo confirmado\n- Uma loja: loja principal.\n- Um usuário: o próprio usuário.\n- Não há necessidade atual de multi-loja, multiusuário ou banco compartilhado entre funcionários.\n\n## Legenda
+## Escopo confirmado
+- Uma loja: loja principal.
+- Um usuário: o próprio usuário.
+- Não há necessidade atual de multi-loja, multiusuário ou banco compartilhado entre funcionários.
+
+## Legenda
 - BACKLOG: ainda não iniciado.
 - READY: pronto e sem dependências pendentes.
 - IN_PROGRESS: em execução.
@@ -44,4 +52,5 @@ flowchart TD
 - A interface é embutida como string HTML em `estoque-web/worker.js`.
 - O navegador mantém produtos e senha em localStorage.
 - O Worker consulta a TagPlus usando segredo configurado no ambiente.
-- Não foi observada uma base de dados central nem autenticação de sessão no servidor.\n- A quantidade importada da TagPlus é inicializada como zero na interface; a política de contagem física e reimportação precisa ser definida.
+- Não foi observada uma base de dados central nem autenticação de sessão no servidor.
+- A quantidade importada da TagPlus é inicializada como zero na interface; a política de contagem física e reimportação precisa ser definida.

@@ -26,4 +26,17 @@
 - Status: aceita como constatação técnica; solução futura pendente.
 - Contexto: a senha é comparada e armazenada no localStorage, e a rota TagPlus não exige sessão autenticada no servidor.
 - Decisão: não tratar a senha local como proteção de API ou autorização multiusuário.
-- Consequências: antes de disponibilizar acesso a outras pessoas/lojas, definir autenticação de servidor e autorização por loja.
+- Consequências: antes de produção, proteger o acesso do único usuário no servidor/edge; não criar autorização por loja nem papéis multiusuário.
+
+
+## ADR-005 — Escopo limitado à loja principal e um usuário
+- Status: aceita em 2026-11-24.
+- Contexto: o usuário confirmou que utilizará somente os dados da loja principal e que apenas ele usará o sistema.
+- Decisão: não implementar multi-loja, multiusuário, cadastro de funcionários ou papéis/permissões. A integração TagPlus fica vinculada à única conta da loja principal.
+- Consequências: arquitetura e autenticação podem ser mais simples. Ainda é necessário proteger a API no servidor e proteger os dados locais contra perda. Banco central só será considerado se houver requisito real de múltiplos dispositivos ou backup centralizado.
+
+## ADR-006 — Preservar a contagem local durante reimportações
+- Status: proposta técnica para implementação.
+- Contexto: o código atual importa produtos da TagPlus com quantidade zero e ignora produtos que já existem, sem atualizar dados cadastrais.
+- Decisão proposta: após validar a integração, atualizar os dados cadastrais de produtos existentes sem zerar nem substituir a quantidade contada pelo usuário.
+- Consequências: reimportações podem manter a contagem em andamento; a regra deve ser coberta por teste antes de uso.

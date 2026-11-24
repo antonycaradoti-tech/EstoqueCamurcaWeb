@@ -8,25 +8,25 @@ Estados: BACKLOG, READY, IN_PROGRESS, BLOCKED, VALIDATING, DONE, REGRESSED.
 | API-001 | Confirmar com a TagPlus o método de autenticação aceito para Personal Access Token, incluindo identificação do consumidor | BLOCKED | Resposta do suporte | Resposta/documentação oficial identifica headers, endpoint e tipo de token |
 | API-002 | Confirmar endpoint v2, escopo read:produtos, paginação e formato do retorno | BLOCKED | API-001 | Contrato documentado e compatível com conta do usuário |
 | API-003 | Implementar autenticação conforme contrato confirmado, mantendo segredos no Cloudflare | BACKLOG | API-001, API-002 | Consulta autenticada funciona no Preview sem expor credenciais |
-| API-004 | Implementar paginação e importação idempotente de produtos | BACKLOG | API-003 | Todos os produtos do escopo são importados sem duplicação |
+| API-004 | Implementar paginação e importação idempotente de produtos | BACKLOG | API-003 | Todos os produtos do escopo são importados sem duplicação |\n| API-006 | Definir política de atualização do catálogo sem zerar nem sobrescrever quantidades já contadas | BACKLOG | API-004 | Reimportação atualiza dados cadastrais e preserva contagem local existente |
 | API-005 | Tratar erros, limites, timeout e renovação de credencial se aplicável | BACKLOG | API-003 | Falhas previsíveis, sem vazar segredos e com recuperação documentada |
 
 ## Fase 2 — Segurança
 | ID | Tarefa | Estado | Dependência | Critério de aceite |
 |---|---|---|---|---|
-| SEC-001 | Proteger o endpoint /api/tagplus/produtos contra acesso público não autorizado | BACKLOG | Definir autenticação de usuários | Requisições sem sessão válida são recusadas |
-| SEC-002 | Substituir a senha local em texto puro por autenticação adequada ao modelo de usuários | BACKLOG | Definir usuários e lojas | Senha não fica armazenada em texto puro no navegador |
+| SEC-001 | Proteger o Worker e /api/tagplus/produtos para um único usuário | BACKLOG | Escolher controle de acesso simples (ex.: Cloudflare Access) | A página e a API só respondem após autenticação do único usuário |
+| SEC-002 | Retirar a falsa sensação de segurança da senha local e integrar o acesso ao controle no servidor | BACKLOG | SEC-001 | A autorização é verificada no servidor/edge; segredo não fica em localStorage |
 | SEC-003 | Remover riscos de XSS na renderização dos dados de produto | BACKLOG | Nenhuma | Dados de produto são exibidos como texto seguro |
 | SEC-004 | Revisar rate limiting, logs, mensagens de erro e exposição de dados | BACKLOG | SEC-001 | Não há segredos ou dados de estoque expostos indevidamente |
 
 ## Fase 3 — Dados e experiência
 | ID | Tarefa | Estado | Dependência | Critério de aceite |
 |---|---|---|---|---|
-| DATA-001 | Definir se haverá múltiplas lojas, usuários e dispositivos | READY | Decisão do usuário | Requisitos e regras de acesso documentados |
-| DATA-002 | Avaliar persistência central em vez de localStorage | BACKLOG | DATA-001 | Dados consistentes entre dispositivos conforme requisito |
+| DATA-001 | Registrar escopo de loja principal e usuário único | DONE | Decisão explícita do usuário em 2026-11-24 | Documentação exclui multi-loja e multiusuário |
+| DATA-002 | Manter localStorage como primeira versão e avaliar necessidade de banco central apenas se houver uso em outro dispositivo | BACKLOG | Confirmar dispositivo de uso e criticidade dos dados | Dados não são perdidos sem possibilidade de recuperação; não introduzir banco sem necessidade |\n| DATA-003 | Criar backup e restauração dos dados locais da contagem | READY | Nenhuma | Backup JSON pode ser exportado e restaurado com validação e sem apagar dados acidentalmente |
 | UI-001 | Melhorar feedback de sincronização, progresso e erros | BACKLOG | API-003 | Usuário entende o que foi importado e o que falhou |
 | UI-002 | Preservar fluxo de senha/login e lista atual durante melhorias | VALIDATING | Mudanças futuras | Testes de regressão aprovados |
-| UI-003 | Corrigir e testar escapes de barras invertidas em validação de código e exportação/cópia | BACKLOG | Nenhuma | Códigos com letra s, espaços inválidos e exportação com quebras de linha corretas são testados |
+| UI-003 | Validar leitura de códigos, cópia e exportação CSV em teste de regressão | READY | Nenhuma | Códigos válidos/inválidos e exportação com quebras de linha corretas passam em teste |
 
 ## Fase 4 — Qualidade e entrega
 | ID | Tarefa | Estado | Dependência | Critério de aceite |
@@ -38,7 +38,7 @@ Estados: BACKLOG, READY, IN_PROGRESS, BLOCKED, VALIDATING, DONE, REGRESSED.
 | DEP-002 | Validar Preview antes de qualquer merge | READY | TEST-002 | Usuário confirma fluxo e PR revisado |
 | DEP-003 | Publicar em produção somente com aprovação explícita | BLOCKED | DEP-002 | Aprovação explícita e verificação pós-deploy |
 
-## Evidências já disponíveis
+## Escopo confirmado\n- Uma única loja: loja principal.\n- Um único usuário: o próprio usuário.\n- Multi-loja, multiusuário e papéis/permissões de funcionários estão fora do escopo.\n- Não adicionar banco de dados central sem necessidade demonstrada; primeiro proteger e respaldar o armazenamento local.\n\n## Evidências já disponíveis
 - Usuário confirmou que o primeiro acesso/login funcionou no Preview após commit `8e53b4f`.
 - Comentário automático do Cloudflare no PR registra Preview com build e deploy bem-sucedidos para commit `586e5ec` em 2026-11-19.
 - Teste TagPlus mais recente informado pelo usuário falhou com erro de autenticação/identificação do consumidor; por isso API-001 permanece BLOCKED.

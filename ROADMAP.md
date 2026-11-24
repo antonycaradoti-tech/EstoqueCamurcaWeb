@@ -25,12 +25,12 @@ Estados: BACKLOG, READY, IN_PROGRESS, BLOCKED, VALIDATING, DONE, REGRESSED.
 | DATA-001 | Definir se haverá múltiplas lojas, usuários e dispositivos | READY | Decisão do usuário | Requisitos e regras de acesso documentados |
 | DATA-002 | Avaliar persistência central em vez de localStorage | BACKLOG | DATA-001 | Dados consistentes entre dispositivos conforme requisito |
 | UI-001 | Melhorar feedback de sincronização, progresso e erros | BACKLOG | API-003 | Usuário entende o que foi importado e o que falhou |
-| UI-002 | Preservar fluxo de senha/login e lista atual durante melhorias | VALIDATING | Mudanças futuras | Testes de regressão aprovados |
+| UI-002 | Preservar fluxo de senha/login e lista atual durante melhorias | VALIDATING | Mudanças futuras | Testes de regressão aprovados |\n| UI-003 | Corrigir e testar escapes de barras invertidas em validação de código e exportação/cópia | BACKLOG | Nenhuma | Códigos com letra s, espaços inválidos e exportação com quebras de linha corretas são testados |
 
 ## Fase 4 — Qualidade e entrega
 | ID | Tarefa | Estado | Dependência | Critério de aceite |
 |---|---|---|---|---|
-| TEST-001 | Criar testes automatizados ou verificações reproduzíveis para rotas e transformação dos produtos | BACKLOG | API-003 | Casos positivos, negativos e dados inválidos cobertos |
+| TEST-001 | Criar testes automatizados ou verificações reproduzíveis para rotas e transformação dos produtos | BACKLOG | API-003 | Casos positivos, negativos e dados inválidos cobertos |\n| DOC-001 | Alinhar README ao endpoint e à configuração atuais do Worker | BACKLOG | API-002 | Documentação corresponde ao código validado |
 | TEST-002 | Criar checklist de regressão do primeiro acesso, lista, exportação e sincronização | READY | Nenhuma | Checklist executado e evidências registradas |
 | DEP-001 | Revisar configuração Workers Builds para Preview e Production | VALIDATING | Nenhuma | Preview e produção têm comandos e variáveis separados |
 | DEP-002 | Validar Preview antes de qualquer merge | READY | TEST-002 | Usuário confirma fluxo e PR revisado |
